@@ -1,5 +1,5 @@
-import {ynode, shuffle, comprehension_set} from './utils.js';
-import {get_puzzle_board, get_puzzle_tree} from './forced_win_boards.js';
+import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils.js';
+import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
 
 export var config = {};
