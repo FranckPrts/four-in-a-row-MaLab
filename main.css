@@ -1,0 +1,46 @@
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#progress-bar {
+    background-color: #ccc;
+    position: absolute;
+    right: 5vw;
+}
+#progress {
+    background-color: #737373;
+    width: 100%;
+    height: 100%;
+    position: inherit;
+    bottom: 0;
+}
+#game-canvas {
+    background-color:#999999;
+}
+
+table {
+    margin: 0 auto;
+    font-size: 32px;
+}
+/* p {
+    font-size: 24px;
+} */
+#jspsych-content {
+    font-size: 24px;
+}
+.layout{
+    font-size: 24px;
+}
+.comprehension{
+    text-align: left !important;
+    padding-left: 8vw;
+    padding-right: 8vw;
+}
+.jspsych-html-button-response-button{
+    display:block !important;
+    margin: 10px !important;
+}
+.img-container{
+    text-align: center !important;
+}
