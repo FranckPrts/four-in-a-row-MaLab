@@ -1,6 +1,28 @@
 import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils.js';
 import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/jspsych.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-html-keyboard-response.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-preload.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-html-button-response.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-html-keyboard-response-number.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-survey.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-instructions.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/jspsych/plugin-fullscreen.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/four-in-a-row.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/four-in-a-row-freeplay.js"
+import "https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/makemove.js"
+  
+
+//initialize global jsPsych
+var jsPsych = initJsPsych({
+show_progress_bar: true,
+on_close: function(e){
+    e.preventDefault();
+    e.returnValue = '';
+},
+});
+
 
 export var config = {};
 export var points = 0;
