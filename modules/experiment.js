@@ -145,6 +145,7 @@ export function save_free_play_data(){
         player_color: data.player_color,
         result: data.result
     };
+	console.log(result)
     uploadData(config.id, "free_play", data.game_index, result)
 }
 
@@ -246,6 +247,7 @@ export function create_timeline(timeline){
         'media/instructions7.png', 
         'media/instructions8.png', 
         'media/instructions9.png'];
+
     var audio = ['media/sounds/correct6.wav', 'media/sounds/wrong1.wav'];
 
     var preload = {
@@ -658,7 +660,7 @@ export function create_timeline(timeline){
     // timeline.push(enter_fullscreen);
     // timeline.push(consent_form);
     // timeline.push(demographic_survey);
-    // timeline.push(free_play_comprehension);
+    timeline.push(free_play_comprehension);
 
 
     // timeline.push(after_practice);
