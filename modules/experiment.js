@@ -2,12 +2,13 @@ import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/Fra
 import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
 
-export var config = {};
-export var points = 0;
-export var bonus = 0;
-export var level = 50;
-export var free_play_tutorial_try = 0;
-export var puzzles_tutorial_try = 0;
+export var config					 = {};
+export var points					 = 0;
+export var numberOfTrial 			 = 4;
+export var bonus					 = 0;
+export var level					 = 50;
+export var free_play_tutorial_try    = 0;
+export var puzzles_tutorial_try      = 0;
 
 export function get_level(){
     return level
@@ -112,42 +113,86 @@ export function save_puzzle_data(){
     }
 }
 
-export function save_free_play_data(){
-    let data = jsPsych.data.getLastTrialData().trials[0]
-    // let existing_data = readData(config.id, "free_play", data.game_index)
-    // existing_data.then((result) => {
-    //     if (result != null){
-    //         result.push(data.solution)
-    //     } else {
-    //         result = [data.solution]
-    //     }
-    //     uploadData(config.id, "free_play", data.game_index, result)
-    // })
-    if (data.result == 'win'){
+// export function save_free_play_data(){  					// THIS IS THE ORIGNIAL FUNCTION
+    
+// 	let data = jsPsych.data.getLastTrialData().trials[0]
+
+//     if (data.result == 'win'){
+//         points += 100;
+//         bonus += 0.2;
+//         level = Math.min(199, level + 10);
+//     } else if (data.result == 'tie'){
+//         points += 50;
+//         bonus += 0.1;
+//         level = Math.max(0, level - 10);
+//     } else {
+//         level = Math.max(0, level - 10);
+//     }
+//     // let result = {
+//     //     solution: data.solution,
+//     //     first_move_RT: data.first_move_RT,
+//     //     all_move_RT: data.all_move_RT,
+//     //     all_move_times: data.all_move_times,
+//     //     mouse_movements: data.mouse_movements,
+//     //     duration: data.duration,
+//     //     level: data.level,
+//     //     player_color: data.player_color,
+//     //     result: data.result
+//     // };
+    
+// 	let result_MH = {
+//         first_move_RT: data.first_move_RT,
+//         all_move_RT: data.all_move_RT,
+//         all_move_times: data.all_move_times,
+//         duration: data.duration,
+//         level: data.level,
+//         player_color: data.player_color,
+//         result: data.result
+//     };
+// 	console.log(result_MH)
+//     //uploadData(config.id, "free_play", data.game_index, result)
+
+// }
+
+// // Define an array to store trial results
+
+let allTrialResults = [];
+
+export function save_free_play_data() {
+    let data = jsPsych.data.getLastTrialData().trials[0];
+
+	let result_MH = {
+        // solution: data.solution,
+        first_move_RT: data.first_move_RT,
+        // all_move_RT: data.all_move_RT,
+        // all_move_times: data.all_move_times,
+        // mouse_movements: data.mouse_movements,
+        duration: data.duration,
+        level: data.level,
+        // player_color: data.player_color,
+        result: (data.result === 'win') ? 1 : 0,
+		game_lenght: data.all_move_RT.length
+    };
+    // Update trial results array
+    allTrialResults.push(result_MH);
+
+    // Perform parameter adjustments based on trial results
+    if (data.result == 'win') {
         points += 100;
         bonus += 0.2;
         level = Math.min(199, level + 10);
-    } else if (data.result == 'tie'){
+    } else if (data.result == 'tie') {
         points += 50;
         bonus += 0.1;
         level = Math.max(0, level - 10);
     } else {
         level = Math.max(0, level - 10);
     }
-    let result = {
-        solution: data.solution,
-        first_move_RT: data.first_move_RT,
-        all_move_RT: data.all_move_RT,
-        all_move_times: data.all_move_times,
-        mouse_movements: data.mouse_movements,
-        duration: data.duration,
-        level: data.level,
-        player_color: data.player_color,
-        result: data.result
-    };
-	console.log(result)
-    uploadData(config.id, "free_play", data.game_index, result)
+
+    console.log(allTrialResults);
 }
+
+
 
 export function save_demographic_data(){
     let data = jsPsych.data.getLastTrialData().trials[0]
@@ -361,11 +406,11 @@ export function create_timeline(timeline){
     var free_play_instructions = {
         type: jsPsychInstructions,
         pages: [
-        'You will receive <b>$6</b> for completing the experiment, with a maximum bonus of <b>$14</b> based on performance. <br/><br/>' +
-        'If you drop out early or end the experiment before it is complete, you will not be paid.',
-        'In this experiment, you and the computer will place black or white pieces on a game board.<br/><br/>' +
+        // 'You will receive <b>$6</b> for completing the experiment, with a maximum bonus of <b>$14</b> based on performance. <br/><br/>' +
+        // 'If you drop out early or end the experiment before it is complete, you will not be paid.',
+        `<h1>Welcome!</h1><br/>In this game, you and the computer will place black or white pieces on a game board.<br/><br/>` +
         '<img width="80%" height="auto" src="media/instructions1.png"></img>',
-        'If you get 4 pieces in a row, you win! <br/><br/>' +
+        'If you get 4 pieces in a row, you win!<br/><br/>' +
         '<img width="80%" height="auto" src="media/instructions2.png"></img>',
         'You can connect your 4 pieces in any direction: horizontally, vertically or diagonally.<br/><br/>' +
         '<img width="80%" height="auto" src="media/instructions3.png"></img>',
@@ -373,8 +418,8 @@ export function create_timeline(timeline){
         'If the board is full and no one has 4-in-a-row, the game is a <b>tie</b>.<br/><br/>' +
         '<img width="80%" height="auto" src="media/instructions4.png"></img>',
         'Black always goes first. You will alternate between playing as black and white <br/><br/>(if you play black in your first game, you will play white in your second game, etc.).',
-        'The experiment is split into two parts. In the first part, you will be freely playing against a computer ' +
-        'agent. <br/><br/>' +
+        // 'The experiment is split into two parts. In the first part, you will be freely playing against a computer ' +
+        // 'agent. <br/><br/>' +
         'You will receive a <b>bonus reward</b> for every game you win. <br/><br/>' +//<b>The more points you have, the higher your bonus will be</b>. <br/><br/>' +
         'You will get <b>$0.30 for winning</b> a game, <b>$0.15 for a tie</b> and <b>$0.00 if you lose</b>.',
         'This part consists of 30 games. You will now play two practice games to see how it works.'
@@ -384,7 +429,7 @@ export function create_timeline(timeline){
     }
 
     let free_play_tutorial = [];
-    free_play_tutorial.push(free_play_instructions);
+    free_play_tutorial.push(free_play_instructions);		// add lab.js conditional for instruction here
 
     free_play_tutorial.push({
         type: jsPsychFourInARow,
@@ -651,7 +696,12 @@ export function create_timeline(timeline){
             //jsPsych.data.displayData();
         }
     }
-    // Preset order
+    
+	
+	
+	
+	
+	// Preset order
     //let order = [17, 23, 1, 27, 4, 33, 36, 26, 6, 12, 5, 13, 29, 38, 30, 19, 22, 11, 20, 15, 9, 3, 21, 37, 7, 24, 18, 28, 10, 31, 16, 8, 32, 40, 25, 35, 2, 14, 39, 34];
     let order = [17, 23, 1, 27, 4, 26, 6, 12, 5, 13, 29, 30, 19, 22, 11, 20, 15, 9, 3, 21, 7, 24, 18, 28, 10, 16, 8, 25, 2, 14];
 
@@ -660,12 +710,14 @@ export function create_timeline(timeline){
     // timeline.push(enter_fullscreen);
     // timeline.push(consent_form);
     // timeline.push(demographic_survey);
-    timeline.push(free_play_comprehension);
+    
+
+	//timeline.push(free_play_comprehension);   		// will have to be added
 
 
     // timeline.push(after_practice);
     let color = 1;
-    for(let i=0; i<30; i++){
+    for(let i=0; i<numberOfTrial; i++){
         color = (color+1) % 2;
         if (i > 0){
             timeline.push(ready_check_free_play)
@@ -678,6 +730,11 @@ export function create_timeline(timeline){
             player: color
         })
     }
+
+	// Use setTimeout to ensure the aggregagtion is executed after the loop completes
+	setTimeout(() => {
+		console.log("agg coming")
+	}, 0);
     
     //timeline.push(preload);
     //timeline.push(puzzles_comprehension);
