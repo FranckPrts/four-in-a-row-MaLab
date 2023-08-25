@@ -1,15 +1,21 @@
 import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils.js';
 import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
-
 export var config					 = {};
 export var points					 = 0;
-export var numberOfTrial 			 = 4;
+export var numberOfTrial 			 = 30;
 export var bonus					 = 0;
 export var level					 = 50;
 export var free_play_tutorial_try    = 0;
 export var puzzles_tutorial_try      = 0;
+export var allTrialResults           = [];
 
+// setters function
+export function set_numberOfTrial(NumberOfTrial){
+    numberOfTrial = NumberOfTrial
+}
+
+// getters function
 export function get_level(){
     return level
 }
@@ -156,22 +162,21 @@ export function save_puzzle_data(){
 
 // // Define an array to store trial results
 
-let allTrialResults = [];
 
 export function save_free_play_data() {
     let data = jsPsych.data.getLastTrialData().trials[0];
 
 	let result_MH = {
         // solution: data.solution,
-        first_move_RT: data.first_move_RT,
+        FIAR_first_move_RT: data.first_move_RT,
         // all_move_RT: data.all_move_RT,
         // all_move_times: data.all_move_times,
         // mouse_movements: data.mouse_movements,
-        duration: data.duration,
-        level: data.level,
+        FIAR_total_duration: data.duration,
+        FIAR_level: data.level,
         // player_color: data.player_color,
-        result: (data.result === 'win') ? 1 : 0,
-		game_lenght: data.all_move_RT.length
+        FIAR_result: data.result, // (data.result === 'win') ? 1 : 0,
+		FIAR_game_length: data.all_move_RT.length
     };
     // Update trial results array
     allTrialResults.push(result_MH);
@@ -188,10 +193,75 @@ export function save_free_play_data() {
     } else {
         level = Math.max(0, level - 10);
     }
-
     console.log(allTrialResults);
 }
 
+export function calculateAverage(resultsArray) {
+    if (resultsArray.length === 0) {
+        return null; // Return null if there are no results
+    }
+
+    let average = {
+        FIAR_first_move_RT		: 0,
+        FIAR_total_duration		: 0,
+        FIAR_level_average		: 0,
+        FIAR_game_length_average		: 0,
+        FIAR_level_min			: resultsArray[0].FIAR_level,
+        FIAR_level_max			: resultsArray[0].FIAR_level,
+        FIAR_number_of_wins		: 0,
+		FIAR_number_of_losses	: 0,
+		FIAR_number_of_ties		: 0
+    };
+    
+    let resultCounts = {
+        win: 0,
+        tie: 0,
+        loss: 0
+    };
+
+    // Sum up the values for each property across all trials
+    for (let i = 0; i < resultsArray.length; i++) {
+		let trialData = resultsArray[i];
+        
+        average.FIAR_first_move_RT += trialData.FIAR_first_move_RT;
+        average.FIAR_total_duration += trialData.FIAR_total_duration;
+        average.FIAR_game_length_average += trialData.FIAR_game_length;
+        average.FIAR_level_average += trialData.FIAR_level;
+		
+        // Update min and max level
+        if (trialData.FIAR_level < average.FIAR_level_min) {
+			average.FIAR_level_min = trialData.FIAR_level;
+        }
+        if (trialData.FIAR_level > average.FIAR_level_max) {
+			average.FIAR_level_max = trialData.FIAR_level;
+        }
+		
+		console.log(resultsArray);
+		// Update result counts
+		if (trialData.FIAR_result === 'win') {
+			average.FIAR_number_of_wins++;
+		} else if (trialData.FIAR_result === 'loss') {
+			average.FIAR_number_of_losses++;
+		} else if (trialData.FIAR_result === 'tie') {
+			average.FIAR_number_of_ties++;
+		}
+    }
+
+    // Calculate the average by dividing the summed values by the number of trials
+    let numTrials = resultsArray.length;
+	average.FIAR_first_move_RT /= numTrials;
+    average.FIAR_total_duration /= numTrials;
+    average.FIAR_level_average /= numTrials;
+    average.FIAR_game_length_average /= numTrials;
+    
+    // for (let result in resultCounts) {
+    //     if (resultCounts.hasOwnProperty(result)) {
+    //         average.result[result] = resultCounts[result] / numTrials;
+    //     }
+    // }
+
+    return average;
+}
 
 
 export function save_demographic_data(){
@@ -280,20 +350,20 @@ export function set_subject_ineligible(){
  */
 export function create_timeline(timeline){
     var images = [
-        'media/free_play_comprehension.png',
-        'media/puzzles_comprehension1.png',
-        'media/puzzles_comprehension2.png',
-        'media/instructions1.png',
-        'media/instructions2.png', 
-        'media/instructions3.png',
-        'media/instructions4.png',
-        'media/instructions5.png', 
-        'media/instructions6.png', 
-        'media/instructions7.png', 
-        'media/instructions8.png', 
-        'media/instructions9.png'];
+        'static/free_play_comprehension.png',
+        'static/puzzles_comprehension1.png',
+        'static/puzzles_comprehension2.png',
+        'static/instructions1.png',
+        'static/instructions2.png', 
+        'static/instructions3.png',
+        'static/instructions4.png',
+        'static/instructions5.png', 
+        'static/instructions6.png', 
+        'static/instructions7.png', 
+        'static/instructions8.png', 
+        'static/instructions9.png'];
 
-    var audio = ['media/sounds/correct6.wav', 'media/sounds/wrong1.wav'];
+    var audio = ['static/correct6.wav', 'static/wrong1.wav'];
 
     var preload = {
         type: jsPsychPreload,
@@ -324,9 +394,9 @@ export function create_timeline(timeline){
             [{
                 type: 'html',
                 prompt: '<p>Please read the consent form and sign by ticking the checkbox.</p>'+
-                    '<iframe src="media/consent.pdf#zoom=60" width="100%" height="300px"></iframe>'+
+                    '<iframe src="static/consent.pdf#zoom=60" width="100%" height="300px"></iframe>'+
                     '<p style="font-size:10pt; margin:0">' +
-                    '<a href="media/consent.pdf" target="_blank" download="media/consent.pdf" style="font-size:10pt; margin:0; color:#b0ccff">' +
+                    '<a href="static/consent.pdf" target="_blank" download="static/consent.pdf" style="font-size:10pt; margin:0; color:#b0ccff">' +
                     'Click here to download the pdf for your records.</a></p>',
             }, 
             {
@@ -409,14 +479,14 @@ export function create_timeline(timeline){
         // 'You will receive <b>$6</b> for completing the experiment, with a maximum bonus of <b>$14</b> based on performance. <br/><br/>' +
         // 'If you drop out early or end the experiment before it is complete, you will not be paid.',
         `<h1>Welcome!</h1><br/>In this game, you and the computer will place black or white pieces on a game board.<br/><br/>` +
-        '<img width="80%" height="auto" src="media/instructions1.png"></img>',
+        '<img width="80%" height="auto" src="static/instructions1.png"></img>',
         'If you get 4 pieces in a row, you win!<br/><br/>' +
-        '<img width="80%" height="auto" src="media/instructions2.png"></img>',
+        '<img width="80%" height="auto" src="static/instructions2.png"></img>',
         'You can connect your 4 pieces in any direction: horizontally, vertically or diagonally.<br/><br/>' +
-        '<img width="80%" height="auto" src="media/instructions3.png"></img>',
+        '<img width="80%" height="auto" src="static/instructions3.png"></img>',
         'If the computer gets 4-in-a-row before you do, you <b>lose</b>.<br/><br/>',
         'If the board is full and no one has 4-in-a-row, the game is a <b>tie</b>.<br/><br/>' +
-        '<img width="80%" height="auto" src="media/instructions4.png"></img>',
+        '<img width="80%" height="auto" src="static/instructions4.png"></img>',
         'Black always goes first. You will alternate between playing as black and white <br/><br/>(if you play black in your first game, you will play white in your second game, etc.).',
         // 'The experiment is split into two parts. In the first part, you will be freely playing against a computer ' +
         // 'agent. <br/><br/>' +
@@ -461,7 +531,7 @@ export function create_timeline(timeline){
                 answer: 2
             },
             {
-                text: `<div class="img-container"><img src='media/free_play_comprehension.png' height=300/></div><br/><br/>
+                text: `<div class="img-container"><img src='static/free_play_comprehension.png' height=300/></div><br/><br/>
                        <h3>Which player has won in this case?</h3>`
                 , 
                 options: [
@@ -509,11 +579,11 @@ export function create_timeline(timeline){
         pages: [
         'You will now start the second part of the experiment.',
         'Instead of starting from an empty board, you will start with pieces already on the board.<br/><br/>' +
-        "<img width='80%' height='auto' src='media/instructions5.png'></img>",
+        "<img width='80%' height='auto' src='static/instructions5.png'></img>",
         'The text on top will tell you how many moves you are given to get a 4-in-a-row. <br/><br/>Furthermore, it also says what color you are playing. <br/><br/>' +
-        "<img width='80%' height='auto' src='media/instructions7.png'></img>",
+        "<img width='80%' height='auto' src='static/instructions7.png'></img>",
         'Your job is to find the correct sequence of moves that leads to a 4-in-a-row. <br/>' + 
-        "<img width='80%' height='auto' src='media/instructions6.png'></img>",
+        "<img width='80%' height='auto' src='static/instructions6.png'></img>",
         "The opponent will make the best possible moves to stop you from getting a 4-in-a-row.<br/>"+
         "You must therefore choose the moves that will <b>FORCE</b> a win within the specified number of moves.",
         'Puzzles requiring more moves will give more <b>bonus reward</b> if solved.<br/><br/>' +
@@ -537,11 +607,11 @@ export function create_timeline(timeline){
         </table><br/><br/>`,
         'You can take <b>as much time as you want for the first move</b>. <br/><br/>Use this time to <b>plan</b> which moves you will make.',
         //'As soon as the timer bar on the right turns green, you can make your first move. <br/><br/> (You may always choose to wait longer to plan a bit more if you would like.)'+
-        //"<img width='30%' height='auto' src='media/instructions_extra.png'></img>",
+        //"<img width='30%' height='auto' src='static/instructions_extra.png'></img>",
         'You will have <b>3 seconds </b>to make every move afterwards.<br/><br/>' +
-        "<img width='80%' height='auto' src='media/instructions8.png'></img>",
+        "<img width='80%' height='auto' src='static/instructions8.png'></img>",
         'If you make a move that does not lead to a 4-in-a-row in the specified number of moves,</br> the trial will end and you will get no bonus reward. <br/><br/>' +
-        "<img width='80%' height='auto' src='media/instructions9.png'></img>",
+        "<img width='80%' height='auto' src='static/instructions9.png'></img>",
         'There are 30 puzzles in total. As before, we will do two practice rounds first.',
         ],
         show_clickable_nav: true,
@@ -591,7 +661,7 @@ export function create_timeline(timeline){
                 answer: 1
             },
             {
-                text: `<div class="img-container"><img src='media/puzzles_comprehension1.png' height=300/></div><br/><br/>
+                text: `<div class="img-container"><img src='static/puzzles_comprehension1.png' height=300/></div><br/><br/>
                        <h3>Which color are you playing in this case?</h3>`
                 , 
                 options: [
@@ -603,7 +673,7 @@ export function create_timeline(timeline){
                 answer: 1
             },
             {
-                text: `<div class="img-container"><img src='media/puzzles_comprehension2.png' height=300/></div><br/><br/>
+                text: `<div class="img-container"><img src='static/puzzles_comprehension2.png' height=300/></div><br/><br/>
                        <h3>Why did the player fail to solve this puzzle (foced win in 2 moves) in this case?</h3>`
                 , 
                 options: [
@@ -643,22 +713,22 @@ export function create_timeline(timeline){
         pages: [
         'As a final check before the experiment, we will walk you through a slightly harder puzzle. <br/><br/>' +
         'This is a <b>length 4</b> puzzle and you are playing as black. <br/><br/>' +
-        "<img width='80%' height='auto' src='media/example1.png'></img>",
+        "<img width='80%' height='auto' src='static/example1.png'></img>",
         'One possible solution starts as follows:<br/><br/>'+
-        "<img width='80%' height='auto' src='media/example2.png'></img>",
+        "<img width='80%' height='auto' src='static/example2.png'></img>",
         'This move forces white to defend <b>the imminent 4-in-a-row</b>:<br/><br/>'+
-        "<img width='80%' height='auto' src='media/example3.png'></img>",
+        "<img width='80%' height='auto' src='static/example3.png'></img>",
         'This can then be repeated:<br/><br/>'+
-        "<img width='80%' height='auto' src='media/example4.png'></img>",
+        "<img width='80%' height='auto' src='static/example4.png'></img>",
         "Where again white's move is <b>forced</b>:<br/><br/>"+
-        "<img width='80%' height='auto' src='media/example5.png'></img>",
+        "<img width='80%' height='auto' src='static/example5.png'></img>",
         "And now we're in a position to make the <b>final blow</b>:<br/><br/>"+
-        "<img width='80%' height='auto' src='media/example6.png'></img>",
+        "<img width='80%' height='auto' src='static/example6.png'></img>",
         "This move forces white to defend on <b>both sides</b>,<br/>"+
         "but only one piece can be placed:<br/><br/>"+
-        "<img width='80%' height='auto' src='media/example7.png'></img>",
+        "<img width='80%' height='auto' src='static/example7.png'></img>",
         "This double attack allows us to overwhelm the opponent and <b>win in 4 moves</b>:<br/><br/>"+
-        "<img width='80%' height='auto' src='media/example8.png'></img>",
+        "<img width='80%' height='auto' src='static/example8.png'></img>",
         "It is up to you to come up with <b>a plan</b> like this in the upcoming puzzles.<br/><br/>"+
         "Since you have <b>limited time</b> to make moves, </br>"+
         "it is best to <b>plan out what you will do at the start of the puzzle</b>.<br/><br/>",
@@ -731,10 +801,6 @@ export function create_timeline(timeline){
         })
     }
 
-	// Use setTimeout to ensure the aggregagtion is executed after the loop completes
-	setTimeout(() => {
-		console.log("agg coming")
-	}, 0);
     
     //timeline.push(preload);
     //timeline.push(puzzles_comprehension);

@@ -81,8 +81,8 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             // Absolute time stamps for each move
             this.move_times = [];
             // Sound effects
-            this.win_sound = new Audio('media/sounds/correct6.wav');
-            this.loss_sound = new Audio('media/sounds/wrong1.wav');
+            this.win_sound = new Audio('static/correct6.wav');
+            this.loss_sound = new Audio('static/wrong1.wav');
             // Stores all mouse movements
             this.mouse_movements = [];
         }
