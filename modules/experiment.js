@@ -20,7 +20,7 @@ export function get_level(){
     return level
 }
 
-export function get_points(){
+export function get_points(){	
     return points
 }
 

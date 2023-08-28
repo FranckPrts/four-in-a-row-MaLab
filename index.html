@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Puzzles</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-preload.js"></script>
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-html-keyboard-response-number.js"></script>
+    <script src="jspsych/plugin-survey.js"></script>
+    <script src="jspsych/plugin-instructions.js"></script>
+    <script src="jspsych/plugin-fullscreen.js"></script>
+    <script src="modules/four-in-a-row.js"></script>
+    <script src="modules/four-in-a-row-freeplay.js"></script>
+    <script src="modules/makemove.js"></script>
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+    <link href="jspsych/jspsych-survey.css" rel="stylesheet" type="text/css" />
+    <link href="main.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+      //initialize global jsPsych
+      var jsPsych = initJsPsych({
+        show_progress_bar: true,
+        on_close: function(e){
+          e.preventDefault();
+          e.returnValue = '';
+        },
+      });
+    </script>
+  </head>
+  <body></body>
+  <script type = "module">
+    import { allTrialResults, calculateAverage, create_timeline, config, readData, ineligible, browser_wrong } from './modules/experiment.js'
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPasmYRie5UGwAnhqblt4pOyYQOWypgDI",
+      authDomain: "puzzles-13ee3.firebaseapp.com",
+      projectId: "puzzles-13ee3",
+      storageBucket: "puzzles-13ee3.appspot.com",
+      messagingSenderId: "912741902214",
+      appId: "1:912741902214:web:d74486ccfb4784cacfee07",
+      measurementId: "G-0W4PN8QBB5"
+    };
+    // Read URL parameters
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const prolific_id = urlParams.get('PROLIFIC_PID')
+    // const study_id = urlParams.get('STUDY_ID')
+    // const session_id = urlParams.get('SESSION_ID')
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase();
+    // Initialize config
+    config.ref = ref
+    config.database = database 
+    config.set = set 
+    config.get = get 
+    config.child = child 
+    config.prolific_id = prolific_id
+    // config.study_id = study_id
+    // config.session_id = session_id
+    config.id = prolific_id;
+    // initialize timeline
+    var timeline = []
+    // add experiment details in place
+    let isEligible = readData(config.id, "eligible", 0)
+    isEligible.then((result) => {
+      if (typeof chrome === "object"){
+        if (result != null){
+            if (result == true){
+              create_timeline(timeline)
+              // run experiment
+              jsPsych.run(timeline).then(() => {
+                console.log(calculateAverage(allTrialResults));
+              });
+            } else{
+              timeline.push(ineligible)
+              // run experiment
+              jsPsych.run(timeline)
+            }
+        } else {
+          create_timeline(timeline)
+          // run experiment
+          jsPsych.run(timeline).then(() => {
+            console.log(calculateAverage(allTrialResults));
+          });
+        }
+      } else {
+        timeline.push(browser_wrong)
+        // run experiment
+        jsPsych.run(timeline)
+      }
+    })
+
+
+  </script>
+</html>
+
+
+

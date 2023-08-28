@@ -141,8 +141,8 @@ var jsPsychFourInARow = (function (jspsych) {
             // Absolute time stamps for each move
             this.move_times = [];
             // Sound effects
-            this.win_sound = new Audio('media/sounds/correct6.wav');
-            this.loss_sound = new Audio('media/sounds/wrong1.wav');
+            this.win_sound = new Audio('static/correct6.wav');
+            this.loss_sound = new Audio('static/wrong1.wav');
             // Puzzle number for records (not used)
             this.puzzle = null;
             // Stores all mouse movements
@@ -277,7 +277,7 @@ var jsPsychFourInARow = (function (jspsych) {
                                     this.end_trial();
                                 },3000);
                             } else{
-                                let au = new Audio('media/sounds/correct1.wav');
+                                let au = new Audio('static/correct1.wav');
                                 au.play();
                                 this.opponent_move();
                                 setTimeout(() => {
