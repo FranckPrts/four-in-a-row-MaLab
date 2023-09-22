@@ -1,11 +1,20 @@
 import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils.js';
 import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
+export var numberOfTrial        = 30;     // Is set from labjs/MH
+export var points               = 0;      // Is set from labjs/MH  
+export var pointForWin          = 100;      // Is set from labjs/MH  
+export var pointForTie          = 50;      // Is set from labjs/MH  
+export var pointForLose         = -100;      // Is set from labjs/MH  
+export var level                = 50;     // Is set from labjs/MH
+export var levelAdjustement     = 10;     // Is set from labjs/MH
+export var show_instruction     = true;   // Is set from labjs/MH
+export var includePracticePlay  = true;   // Is set from labjs/MH
+export var comprehensionTest    = true;   // Is set from labjs/MH
+
+
 export var config					 = {};
-export var points					 = 0;
-export var numberOfTrial 			 = 30;
 export var bonus					 = 0;
-export var level					 = 50;
 export var free_play_tutorial_try    = 0;
 export var puzzles_tutorial_try      = 0;
 export var allTrialResults           = [];
@@ -13,6 +22,33 @@ export var allTrialResults           = [];
 // setters function
 export function set_numberOfTrial(NumberOfTrial){
     numberOfTrial = NumberOfTrial
+}
+export function set_numberOfPoints(Points){
+    points = Points
+}
+export function set_winPoints(winPoints){
+    pointForWin = winPoints
+}
+export function set_tiePoints(tiePoints){
+    pointForTie = tiePoints
+}
+export function set_losePoints(losePoints){
+    pointForLose = losePoints
+}
+export function set_initialLevel(Level){
+    level = Level
+}
+export function set_adjustLevel(Leveladj){
+    levelAdjustement = Leveladj
+}
+export function set_instructionBool(InstructionBool){
+    show_instruction = InstructionBool
+}
+export function set_includePractice(includePractice){
+    includePracticePlay = includePractice
+}
+export function set_comprehensionTest(ComprehensionTest){
+    comprehensionTest = ComprehensionTest
 }
 
 // getters function
@@ -56,6 +92,8 @@ export var browser_wrong = {
  * @param {Number} id the user id
  * @param {object} data the data to be uploaded (in JSON Object form)
  */
+
+
 export function uploadData(id, category, game_index, data){
     config.set(config.ref(config.database, id+"/"+category+"/"+game_index), data).then(() => {
         // Data saved successfully!
@@ -183,17 +221,19 @@ export function save_free_play_data() {
 
     // Perform parameter adjustments based on trial results
     if (data.result == 'win') {
-        points += 100;
-        bonus += 0.2;
-        level = Math.min(199, level + 10);
+        points += pointForWin;
+        //bonus += 0.2;
+        level = Math.min(199, level + levelAdjustement);
+    
     } else if (data.result == 'tie') {
-        points += 50;
-        bonus += 0.1;
-        level = Math.max(0, level - 10);
+        points += pointForTie;
+        //bonus += 0.1;
+        level = Math.max(0, level - levelAdjustement);
+    
     } else {
-        level = Math.max(0, level - 10);
-    }
-    console.log(allTrialResults);
+        points += pointForLose
+        level = Math.max(0, level - levelAdjustement);
+    } console.log(allTrialResults);
 }
 
 export function calculateAverage(resultsArray) {
@@ -236,7 +276,6 @@ export function calculateAverage(resultsArray) {
 			average.FIAR_level_max = trialData.FIAR_level;
         }
 		
-		console.log(resultsArray);
 		// Update result counts
 		if (trialData.FIAR_result === 'win') {
 			average.FIAR_number_of_wins++;
@@ -259,7 +298,8 @@ export function calculateAverage(resultsArray) {
     //         average.result[result] = resultCounts[result] / numTrials;
     //     }
     // }
-
+    console.log('Computed average:')
+    console.log(average)
     return average;
 }
 
@@ -499,26 +539,32 @@ export function create_timeline(timeline){
     }
 
     let free_play_tutorial = [];
-    free_play_tutorial.push(free_play_instructions);		// add lab.js conditional for instruction here
+    
+    // Display instruction 
+    free_play_tutorial.push(free_play_instructions);
+      
+    if (includePracticePlay) {
+        // a first game
+        free_play_tutorial.push({
+            type: jsPsychFourInARow,
+            game_index: 1,
+            get_level: () => 0,
+            on_load: () => {free_play_tutorial_try += 1},
+            on_finish: save_freeplay_practice,
+            player: 0
+        })
 
-    free_play_tutorial.push({
-        type: jsPsychFourInARow,
-        game_index: 1,
-        get_level: () => 0,
-        on_load: () => {free_play_tutorial_try += 1},
-        on_finish: save_freeplay_practice,
-        player: 0
-    })
+        // a second game
+        free_play_tutorial.push({
+            type: jsPsychFourInARow,
+            game_index: 2,
+            get_level: () => 0,
+            on_finish: save_freeplay_practice,
+            player: 1
+        })   
+    }
 
-    free_play_tutorial.push({
-        type: jsPsychFourInARow,
-        game_index: 2,
-        get_level: () => 0,
-        on_finish: save_freeplay_practice,
-        player: 1
-    })
-
-    var free_play_comprehension = comprehension_set({timeline: [...free_play_tutorial]}, 
+    var free_play_comprehension = comprehension_set(//{timeline: [...free_play_tutorial]}, 
         [
             {
                 text: "<h3>What is the goal of the game?</h3>", 
@@ -573,6 +619,9 @@ export function create_timeline(timeline){
             <br/><br/>
         </p>
     `);
+
+      ///////////////////////////// PUZZLE /////////////////////////////
+
 
     var puzzles_instructions = {
         type: jsPsychInstructions,
@@ -752,7 +801,7 @@ export function create_timeline(timeline){
             return `<div> 
                         <p>
                             Thank you for taking part in the study!<br/>
-                            You collected a total of <b>$${get_bonus()}</b> bonus reward.
+                            You collected a total of <b>$${get_points()}</b> points!.
                             (this bonus could take a few days to be applied).
                         <p/>
                         <a href='https://app.prolific.co/submissions/complete?cc=CYRJV1WH'> [Click here to be redirected to Prolific] </a>
@@ -781,8 +830,13 @@ export function create_timeline(timeline){
     // timeline.push(consent_form);
     // timeline.push(demographic_survey);
     
-
-	//timeline.push(free_play_comprehension);   		// will have to be added
+    if (show_instruction) {
+        timeline.push(free_play_tutorial)
+    }
+    
+	if (comprehensionTest) {
+        timeline.push(free_play_comprehension); 
+    }
 
 
     // timeline.push(after_practice);
@@ -825,5 +879,5 @@ export function create_timeline(timeline){
     //         on_finish: save_puzzle_data
     //     })
     // }
-    // timeline.push(submit_block);
+    timeline.push(submit_block);
 }
