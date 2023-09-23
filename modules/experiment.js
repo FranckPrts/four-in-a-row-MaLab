@@ -564,7 +564,7 @@ export function create_timeline(timeline){
         })   
     }
 
-    var free_play_comprehension = comprehension_set(//{timeline: [...free_play_tutorial]}, 
+    var free_play_comprehension = comprehension_set({timeline: [...free_play_tutorial]}, 
         [
             {
                 text: "<h3>What is the goal of the game?</h3>", 
@@ -841,7 +841,7 @@ export function create_timeline(timeline){
 
     // timeline.push(after_practice);
     let color = 1;
-    for(let i=0; i<numberOfTrial; i++){
+    for(let i=0; i<numberOfTrial; i++){ 
         color = (color+1) % 2;
         if (i > 0){
             timeline.push(ready_check_free_play)
