@@ -10,7 +10,7 @@ export function ynode(html){
   return {
     type: jsPsychFullscreen,
     message: html,
-    fullscreen_mode: true,
+    fullscreen_mode: false,
     button_label: "Continue",
     delay_after: 150
   }
