@@ -15,6 +15,13 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
                 // from there
                 type: jspsych.ParameterType.FUNCTION,
             },
+            get_points: {
+                // Adaptively returns the current points of the participant.
+                // Since points is a global parameter, this is a function which
+                // gets passed down from experiment.js, returning the global variable
+                // from there
+                type: jspsych.ParameterType.FUNCTION,
+            },
             player: {
                 // 1 if subject is playing black, 2 if playing white
                 type: jspsych.ParameterType.INT,
@@ -349,11 +356,12 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             if (this.game_result == "win"){
                 //let p = this.free_play ? 100 : this.length == 2 ? 100 : this.length == 3 ? 200 : this.length == 4 ? 300 : 0;
                 let b = this.free_play ? 0.2 : this.length == 2 ? 0.25 : this.length == 3 ? 1.0 : this.length == 4 ? 2.0 : 0;
-                this.top.innerHTML = `You won and got $${b} bonus reward!`;
+                this.top.innerHTML = `You won and got a 100 points!`;
+                //this.top.innerHTML = `You won and got $${b} bonus reward!`;
             } else if (this.game_result == "loss"){
-                this.top.innerHTML = `You lost and got no bonus reward`;
+                this.top.innerHTML = `You lost and lost 50 points`;
             } else if (this.game_result == "tie"){
-                this.top.innerHTML = `You tied and got $0.1 bonus reward!`;
+                this.top.innerHTML = `You tied and got 50 points!`;
             } else if (this.free_play){
                 this.top.innerHTML = `Your turn to move (you are ${this.player})`;//Game ${this.game_index}: ${this.player == this.turn ? "Your" : "Opponent's"}
             }
@@ -385,6 +393,7 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
         };
         trial(display_element, trial){
             this.level = trial.get_level();
+            this.points = trial.get_points();
             // seed, black_pieces, white_pieces, opponent_color, level
             this.ai = Module.cwrap('makemove', 'number', ['number','string','string','number','number']);
             // if (trial.player == 1){
@@ -401,6 +410,7 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             // Display HTML Puzzle ${this.game_index}: 
             display_element.innerHTML = `
             <h1 id='top'>Your turn to move (you are ${this.player})</h1>
+            <h2> You currently have ${this.points} points.</h2>
             <div id="container">
                 <canvas id="game-canvas" width="${this.w}" height="${this.h}"></canvas>
             </div>`

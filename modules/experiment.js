@@ -1,4 +1,4 @@
-import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils.js';
+import {ynode, shuffle, comprehension_set} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/utils-dev-1.js';
 import {get_puzzle_board, get_puzzle_tree} from 'https://cdn.jsdelivr.net/gh/FranckPrts/four-in-a-row-MaLab/modules/forced_win_boards.js';
 
 export var numberOfTrial        = 30;     // Is set from labjs/MH
@@ -8,7 +8,6 @@ export var pointForTie          = 50;      // Is set from labjs/MH
 export var pointForLose         = -100;      // Is set from labjs/MH  
 export var level                = 50;     // Is set from labjs/MH
 export var levelAdjustement     = 10;     // Is set from labjs/MH
-export var showTutorial         = true;   // Is set from labjs/MH
 export var showTutorialAndComprehension    = true;   // Is set from labjs/MH
 
 
@@ -40,11 +39,8 @@ export function set_initialLevel(Level){
 export function set_adjustLevel(Leveladj){
     levelAdjustement = Leveladj
 }
-export function set_instructionBool(InstructionBool){
-    show_instruction = InstructionBool
-}
-export function set_comprehensionTest(ComprehensionTest){
-    comprehensionTest = ComprehensionTest
+export function set_showTutorialAndComprehension(ShowTutorialAndComprehension){
+    showTutorialAndComprehension = ShowTutorialAndComprehension;
 }
 
 // getters function
@@ -511,26 +507,23 @@ export function create_timeline(timeline){
 
     var free_play_instructions = {
         type: jsPsychInstructions,
-        pages: [
-        // 'You will receive <b>$6</b> for completing the experiment, with a maximum bonus of <b>$14</b> based on performance. <br/><br/>' +
-        // 'If you drop out early or end the experiment before it is complete, you will not be paid.',
-        `<h1>Welcome!</h1><br/>In this game, you and the computer will place black or white pieces on a game board.<br/><br/>` +
-        '<img width="80%" height="auto" src="static/instructions1.png"></img>',
-        'If you get 4 pieces in a row, you win!<br/><br/>' +
-        '<img width="80%" height="auto" src="static/instructions2.png"></img>',
-        'You can connect your 4 pieces in any direction: horizontally, vertically or diagonally.<br/><br/>' +
-        '<img width="80%" height="auto" src="static/instructions3.png"></img>',
-        'If the computer gets 4-in-a-row before you do, you <b>lose</b>.<br/><br/>',
-        'If the board is full and no one has 4-in-a-row, the game is a <b>tie</b>.<br/><br/>' +
-        '<img width="80%" height="auto" src="static/instructions4.png"></img>',
-        'Black always goes first. You will alternate between playing as black and white <br/><br/>(if you play black in your first game, you will play white in your second game, etc.).',
-        // 'The experiment is split into two parts. In the first part, you will be freely playing against a computer ' +
-        // 'agent. <br/><br/>' +
-        'You will receive a <b>bonus reward</b> for every game you win. <br/><br/>' +//<b>The more points you have, the higher your bonus will be</b>. <br/><br/>' +
-        'You will get <b>${this.parameters.winPoints} points for winning</b> a game, <b>${this.parameters.tiePoints} for a tie</b> and <b>${this.parameters.losePoints} if you lose</b>.',
-        'This part consists of ${this.parameters.numberOfTrial} games.'
-        ],
+        pages: [],
         show_clickable_nav: true,
+        on_start: function () {
+        // Define the pages dynamically using the variables
+        this.pages.push(`<h1>Welcome!</h1><br/>In this game, you and the computer will place black or white pieces on a game board.<br/><br/>` +
+            '<img width="80%" height="auto" src="https://raw.githubusercontent.com/FranckPrts/four-in-a-row-MaLab/main/static/instructions1.png"></img>');
+        this.pages.push('If you get 4 pieces in a row, you win!<br/><br/>' +
+            '<img width="80%" height="auto" src="https://raw.githubusercontent.com/FranckPrts/four-in-a-row-MaLab/main/static/instructions2.png"></img>');
+        this.pages.push('You can connect your 4 pieces in any direction: horizontally, vertically or diagonally.<br/><br/>' +
+            '<img width="80%" height="auto" src="https://raw.githubusercontent.com/FranckPrts/four-in-a-row-MaLab/main/static/instructions3.png"></img>');
+        this.pages.push('If the computer gets 4-in-a-row before you do, you <b>lose</b>.<br/><br/>');
+        this.pages.push('If the board is full and no one has 4-in-a-row, the game is a <b>tie</b>.<br/><br/>' +
+            '<img width="80%" height="auto" src="https://raw.githubusercontent.com/FranckPrts/four-in-a-row-MaLab/main/static/instructions4.png"></img>');
+        this.pages.push('Black always goes first. You will alternate between playing as black and white <br/><br/>(if you play black in your first game, you will play white in your second game, etc.).');
+        this.pages.push(`You will receive a <b>bonus reward</b> for every game you win. <br/><br/>You will get <b>${pointForWin} points for winning</b> a game, <b>${pointForTie} for a tie</b> and <b>${pointForLose} if you lose</b>.`);
+        this.pages.push(`The experiment consists of ${numberOfTrial} games.`);
+    },
         on_finish: {}//save_freeplay_instruction_data
     }
 
@@ -545,7 +538,7 @@ export function create_timeline(timeline){
         game_index: 1,
         get_level: () => 0,
         on_load: () => {free_play_tutorial_try += 1},
-        on_finish: save_freeplay_practice,
+        on_finish: {},
         player: 0
     })
 
@@ -554,7 +547,7 @@ export function create_timeline(timeline){
         type: jsPsychFourInARow,
         game_index: 2,
         get_level: () => 0,
-        on_finish: save_freeplay_practice,
+        on_finish: {},
         player: 1
     })   
 
@@ -572,7 +565,7 @@ export function create_timeline(timeline){
                 answer: 2
             },
             {
-                text: `<div class="img-container"><img src='static/free_play_comprehension.png' height=300/></div><br/><br/>
+                text: `<div class="img-container"><img src='https://raw.githubusercontent.com/FranckPrts/four-in-a-row-MaLab/main/static/free_play_comprehension.png' height=300/></div><br/><br/>
                        <h3>Which player has won in this case?</h3>`
                 , 
                 options: [
@@ -598,11 +591,11 @@ export function create_timeline(timeline){
                 text: `<h3>How much bonus reward do you get if you tie?</h3>`
                 , 
                 options: [
-                    "$0.30",
-                    "$0.15",
-                    "$0.00"
+                    "50 points",
+                    "100 points",
+                    "-50 points"
                 ], 
-                desc: "You get $0.15 bonus reward for a tie, half of what you get for a win.",
+                desc: "You get 50 points for a tie, half of what you get for a win.",
                 answer: 0
             },
         ]
@@ -841,13 +834,9 @@ export function create_timeline(timeline){
     // timeline.push(consent_form);
     // timeline.push(demographic_survey);
     
-    if (showTutorial && showTutorialAndComprehension) {
+    if (showTutorialAndComprehension) {
         timeline.push(free_play_comprehension);
-      } else if (showTutorial) {
-        timeline.push(free_play_tutorial);
-      } else if (showTutorialAndComprehension) {
-        timeline.push(free_play_comprehension);
-      }
+    }
       
 
     // timeline.push(after_practice);
@@ -861,6 +850,7 @@ export function create_timeline(timeline){
             type: jsPsychFourInARowFreePlay,
             game_index: i+1,
             get_level: get_level,
+            get_points: get_points,
             on_finish: save_free_play_data,
             player: color
         })

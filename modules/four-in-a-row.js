@@ -502,21 +502,22 @@ var jsPsychFourInARow = (function (jspsych) {
         }
         update_top(){
             if (this.game_result == "win"){
-                //let p = this.free_play ? 100 : this.length == 2 ? 100 : this.length == 3 ? 200 : this.length == 4 ? 300 : 0;
-                let b = this.free_play ? 0.2 : this.length == 2 ? 0.25 : this.length == 3 ? 1.0 : this.length == 4 ? 2.0 : 0;
+                let p = this.free_play ? 100 : this.length == 2 ? 100 : this.length == 3 ? 200 : this.length == 4 ? 300 : 0;
+                // let b = this.free_play ? 0.2 : this.length == 2 ? 0.25 : this.length == 3 ? 1.0 : this.length == 4 ? 2.0 : 0;
                 if (this.free_play){
-                    this.top.innerHTML = `You won and got $${b} bonus reward!`;
+                    this.top.innerHTML = `You won and earned ${p} points!`;
                 } else{
-                    this.top.innerHTML = `You found the solution and got $${b} bonus reward!`;
+                    this.top.innerHTML = `You found the solution and got $${p} bonus reward!`;
                 }
             } else if (this.game_result == "loss"){
                 if (this.free_play){
                     this.top.innerHTML = `You lost and got no bonus reward`;
+                    this.top.innerHTML = `You lost and lost 50 points`;
                 } else{
                     this.top.innerHTML = `You did not find the solution and got no bonus reward!`;
                 }
             } else if (this.game_result == "tie"){
-                this.top.innerHTML = `You tied and got $0.1 bonus reward!`;
+                this.top.innerHTML = `You tied and got 50 points!`;
             } else if (this.game_result == "timeout"){
                 this.top.innerHTML = `You ran out of time and got no bonus reward!`;
             } else if (this.free_play){
