@@ -404,6 +404,10 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             // }
             this.reset_pieces(trial);
             this.game_index = trial.game_index;
+            let pb = `
+            <div id="progress-bar">
+                <div id="progress"></div>
+            </div>`
             // Display HTML Puzzle ${this.game_index}: 
             display_element.innerHTML = `
             <h1 id='top'>Your turn to move (you are ${this.player})</h1>
