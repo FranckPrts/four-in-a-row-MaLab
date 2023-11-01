@@ -32,6 +32,7 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
   
     class FourInARowFreePlay {
         constructor(jsPsych){
+            this.pieces = [[], []];
             this.jsPsych = jsPsych;
             // Canvas sizing
             let w = window.innerWidth * 0.8;
@@ -326,15 +327,15 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             // Add listeners again if already removed
             if (trial.player == 1){
                 let move = this.ai(Date.now(), "", "", 0, this.level);
-                trial.pieces = [[move], []];
+                this.pieces = [[move], []];
                 this.current_state = move.toString();
             } else {
                 // Reset tree            
                 this.current_state = "root";
             }
             // Get puzzle board
-            this.black_pieces = [[], []];
-            this.white_pieces = [[], []];
+            this.black_pieces = [...this.pieces[0]];
+            this.white_pieces = [...this.pieces[1]];
             for(const piece of this.black_pieces){
                 this.bp[piece] = 1;
             }
@@ -403,10 +404,6 @@ var jsPsychFourInARowFreePlay = (function (jspsych) {
             // }
             this.reset_pieces(trial);
             this.game_index = trial.game_index;
-            let pb = `
-            <div id="progress-bar">
-                <div id="progress"></div>
-            </div>`
             // Display HTML Puzzle ${this.game_index}: 
             display_element.innerHTML = `
             <h1 id='top'>Your turn to move (you are ${this.player})</h1>
